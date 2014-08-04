@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.0.preview.7">
+<meta name="author" content="aalmiray">
+<title>Griffon Shiro Plugin</title>
+<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css">
+<link rel="stylesheet" href="./coderay-asciidoctor.css">
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Griffon Shiro Plugin</h1>
+<span id="author" class="author">aalmiray</span><br>
+<span id="revnumber">version 1.0.0-SNAPSHOT</span>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_introduction">1. Introduction</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_usage">1.1. Usage</a></li>
+</ul>
+</li>
+<li><a href="#_configuration">2. Configuration</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_fine_tuning_the_access_control">2.1. Fine-tuning the Access Control</a></li>
+<li>
+<ul class="sectlevel3">
+<li><a href="#_about_wildcard_permissions">2.1.1. About Wildcard Permissions</a></li>
+</ul>
+</li>
+<li><a href="#_build_configuration">2.2. Build Configuration</a></li>
+<li>
+<ul class="sectlevel3">
+<li><a href="#_gradle">2.2.1. Gradle</a></li>
+<li>
+<ul class="sectlevel4">
+<li><a href="#_automatic">Automatic</a></li>
+<li><a href="#_manual">Manual</a></li>
+</ul>
+</li>
+<li><a href="#_maven">2.2.2. Maven</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_modules">3. Modules</a></li>
+<li>
+<ul class="sectlevel2">
+<li><a href="#_shiro">3.1. Shiro</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_introduction"><a class="anchor" href="#_introduction"></a>1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://shiro.apache.org/" target="_blank">Apache Shiro</a> is a powerful and easy-to-use Java security framework that
+performs authentication, authorization, cryptography, and session management.</p>
+</div>
+<div class="paragraph">
+<p>This plugin enables access control on controller actions via a set of annotations.
+Security checks will be performed before an action is invoked. Annotated actions
+will be executed if the user meets the security criteria, otherwise execution is
+aborted. The plugin assumes sensible defaults where needed but also lets you
+customize behavior.</p>
+</div>
+<div class="sect2">
+<h3 id="_usage"><a class="anchor" href="#_usage"></a>1.1. Usage</h3>
+<div class="paragraph">
+<p>Controller actions must be annotated with any of the following annotations</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@org.apache.shiro.authz.annotation.RequiresAuthentication</code> - Requires the
+current Subject to have been authenticated during their current session for
+the annotated class/instance/method to be accessed or invoked.</p>
+</li>
+<li>
+<p><code>@org.apache.shiro.authz.annotation.RequiresUser</code> - Requires the current
+Subject to be an authenticated user during their current session for
+the annotated class/instance/method to be accessed or invoked.</p>
+</li>
+<li>
+<p><code>@org.apache.shiro.authz.annotation.RequiresGuest</code> - Requires the current
+Subject to be a "guest", that is, they are not authenticated or remembered
+from a previous session for the annotated class/instance/method to be
+accessed or invoked.</p>
+</li>
+<li>
+<p><code>@org.apache.shiro.authz.annotation.RequiresPermissions</code> - Requires the
+current executor&#8217;s Subject to imply a particular permission in order to
+execute the annotated method. If the executor&#8217;s associated Subject determines
+that the executor does not imply the specified permission, the method will not
+be executed.</p>
+</li>
+<li>
+<p><code>@org.apache.shiro.authz.annotation.RequiresRoles</code> - Requires the currently
+executing Subject to have all of the specified roles. If they do not have the
+role(s), the method will not be executed.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The annotations may be applied at the class level, in which case all actions will
+inherit those constraints. Annotations applied to methods/closures override those
+applied at the class level, for example</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="groovy language-groovy"><span class="line-numbers"> 1</span><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
+<span class="line-numbers"> 2</span><span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
+<span class="line-numbers"> 3</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
+<span class="line-numbers"> 4</span>
+<span class="line-numbers"> 5</span><span class="annotation">@RequiresAuthentication</span>
+<span class="line-numbers"> 6</span><span class="annotation">@ArtifactProviderFor</span>(GriffonController)
+<span class="line-numbers"> 7</span><span class="type">class</span> <span class="class">PrinterController</span> {
+<span class="line-numbers"> 8</span>    <span class="annotation">@RequiresPermission</span>(<span class="string"><span class="delimiter">'</span><span class="content">printer:print</span><span class="delimiter">'</span></span>)
+<span class="line-numbers"> 9</span>    <span class="type">void</span> print() { ... }
+<span class="line-numbers"><strong>10</strong></span>
+<span class="line-numbers">11</span>    <span class="annotation">@RequiresRoles</span>(<span class="string"><span class="delimiter">'</span><span class="content">administrator</span><span class="delimiter">'</span></span>)
+<span class="line-numbers">12</span>    <span class="type">void</span> configure() { ... }
+<span class="line-numbers">13</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Anyone making use of <code>PrinterController</code> must be aun authenticated user. Everyone
+with the permissions <code>printer:print</code> may call the <code>print</code> action. Only those users
+that have been authenticated <em>and</em> posses the <code>administrator</code> role are able to
+call the <code>configure</code> action.</p>
+</div>
+<div class="paragraph">
+<p>Apache Shiro&#8217;s <a href="http://shiro.apache.org/java-authentication-guide.html" target="_blank">Java Authentication Guide</a> presents the basic vocabulary and
+behavior required to authenticate a user into the system. In particular, the
+<code>SecurityUtils</code> class is used to store the current <code>Subject</code>. You may also inject
+an <code>Subject</code> instance, like so</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="groovy language-groovy"><span class="line-numbers"> 1</span><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
+<span class="line-numbers"> 2</span><span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
+<span class="line-numbers"> 3</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
+<span class="line-numbers"> 4</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authc.UsernamePasswordToken</span>
+<span class="line-numbers"> 5</span><span class="keyword">import</span> <span class="include">org.apache.shiro.subject.Subject</span>
+<span class="line-numbers"> 6</span>
+<span class="line-numbers"> 7</span><span class="annotation">@RequiresAuthentication</span>
+<span class="line-numbers"> 8</span><span class="annotation">@ArtifactProviderFor</span>(GriffonController)
+<span class="line-numbers"> 9</span><span class="type">class</span> <span class="class">LoginController</span> {
+<span class="line-numbers"><strong>10</strong></span>    LoginModel model
+<span class="line-numbers">11</span>
+<span class="line-numbers">12</span>    <span class="annotation">@Inject</span>
+<span class="line-numbers">13</span>    <span class="directive">private</span> <span class="predefined-type">Subject</span> subject
+<span class="line-numbers">14</span>
+<span class="line-numbers">15</span>    <span class="annotation">@RequiresGuest</span>
+<span class="line-numbers">16</span>    <span class="type">void</span> login() {
+<span class="line-numbers">17</span>        UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(
+<span class="line-numbers">18</span>            model.username, model.password)
+<span class="line-numbers">19</span>        subject.login(token)
+<span class="line-numbers"><strong>20</strong></span>    }
+<span class="line-numbers">21</span>
+<span class="line-numbers">22</span>    <span class="annotation">@RequiresAuthentication</span>
+<span class="line-numbers">23</span>    <span class="type">void</span> logout() {
+<span class="line-numbers">24</span>        subject.logout()
+<span class="line-numbers">25</span>    }
+<span class="line-numbers">26</span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>login</code> action will be executed when there&#8217;s no authenticated user while
+the <code>logout</code> action will be executed only if the user is currently authenticated.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuration"><a class="anchor" href="#_configuration"></a>2. Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The plugin requires an instance of <code>org.apache.shiro.mgt.SecurityManager</code> to work.
+The <code>ShiroModule</code> registers <code><a href="http://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/mgt/DefaultSecurityManager.html" target="_blank">org.apache.shiro.mgt.DefaultSecurityManager</a></code> as the default implementation
+that relies on a properties based <code><a href="http://shiro.apache.org/static/current/apidocs/org/apache/shiro/realm/Realm.html" target="_blank">org.apache.shiro.realm.Realm</a></code>, whose default settings point
+to a file named <code>shiro-users.properties</code> that must be available in the classpath.
+The location of this resource may be changed too, defining a different value for
+<code>shiro.realm.resource.path</code> in the applications&#8217; configuration.</p>
+</div>
+<div class="paragraph">
+<p>Security failures are handled by default by simply logging the failed attempt.
+This behavior can be changed too, for example displaying a dialog with a meaningful
+message. To change the default behavior configure a module binding for <code><a href="api/griffon/plugins/shiro/SecurityFailureHandler.html" target="_blank">griffon.plugins.shiro.SecurityFailureHandler</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>Its value should be a className implementing <code>griffon.plugins.shiro.SecurityFailureHandler</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following section was adapted from <a href="http://grails.org/plugin/shiro" target="_blank">Grails Shiro plugin</a> original by Peter Ledbrook (<a href="http://twitter.com/pledbrook" target="_blank">@pledbrook</a>).</p>
+</div>
+<div class="sect2">
+<h3 id="_fine_tuning_the_access_control"><a class="anchor" href="#_fine_tuning_the_access_control"></a>2.1. Fine-tuning the Access Control</h3>
+<div class="paragraph">
+<p>The default Shiro setup provided this plugin  is very flexible and powerful. It&#8217;s
+based on permission strings known as "wildcard permissions" that are simple to
+use, but in some ways difficult to understand because they are also very flexible.</p>
+</div>
+<div class="sect3">
+<h4 id="_about_wildcard_permissions"><a class="anchor" href="#_about_wildcard_permissions"></a>2.1.1. About Wildcard Permissions</h4>
+<div class="paragraph">
+<p>Let&#8217;s start with an example. Say you want to protect access to your company&#8217;s
+printers such that some people can print to particular printers, while others
+can find out what jobs are currently in the queue. The basic type of permission
+is therefore "printer", while we have two sub-types: "query" and "print". We
+also want to restrict access on a per-printer basis, so we then have a second
+sub-type that is the printer name. In wildcard permission format, the permission
+requirements are</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:query:lp720 0
+printer:print:epsoncolor</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice how each part is separated by a colon? That&#8217;s how the wildcard permission
+format separates what it calls "parts". It&#8217;s also worth pointing out at this
+stage that Apache Shiro has no understanding of printer permissions - they are
+used and interpreted by the application.</p>
+</div>
+<div class="paragraph">
+<p>So those are permission requirements. They state what permission is required to
+do something. In the above example, the first permission says that a user must
+have the right to query the "lp7200" printer. That&#8217;s just the application&#8217;s
+interpretation of the string, though. You still need to code the permission
+requirement into your application. A simple way to do this is in a condition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code class="groovy language-groovy"><span class="keyword">if</span> (subject.isPermitted(<span class="string"><span class="delimiter">'</span><span class="content">printer:query:lp7200</span><span class="delimiter">'</span></span>)) {
+    <span class="comment">// Return the current jobs on printer lp7200</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the other side of the coin, you have permission assignments where you say what
+rights particular users have. In the quick start example, you saw a permission
+assignment in the BootStrap class.</p>
+</div>
+<div class="paragraph">
+<p>Assignments look a lot like permission requirements, but they also support syntax
+for wildcards and specifying multiple types or sub-types. What do I mean by that?
+Well, imagine you want a user to have print access to all the printers in a company.
+You could assign all the permissions manually:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:print:lp7200
+printer:print:epsoncolor
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>but this doesn&#8217;t scale well, particularly when new printers are added. You can
+instead use a wildcard:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:print:*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This does scale, because it covers any new printers as well. You could even allow
+access to all actions on all printers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:*:*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or all actions on a single printer:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:*:lp7200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or even specific actions:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:query,print:lp7200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <em>*</em> wildcard and <em>,</em> sub-type separator can be used in any part of the
+permission, even the first part as you saw in the BootStrap example.</p>
+</div>
+<div class="paragraph">
+<p>One final thing to note about permission assignments: missing parts imply that
+the user has access to all values corresponding to that part. In other words,</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:print</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is equivalent to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:print:*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is equivalent to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:*:*</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, you can only leave off parts from the end of the string, so this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:lp7200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is not equivalent to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay"><code>printer:*:lp7200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Permission assignments like these are typically done at the database level,
+although it depends on your realm implementation.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_configuration"><a class="anchor" href="#_build_configuration"></a>2.2. Build Configuration</h3>
+<div class="sect3">
+<h4 id="_gradle"><a class="anchor" href="#_gradle"></a>2.2.1. Gradle</h4>
+<div class="paragraph">
+<p>You have two options for configuring this plugin: automatic and manual.</p>
+</div>
+<div class="sect4">
+<h5 id="_automatic"><a class="anchor" href="#_automatic"></a>Automatic</h5>
+<div class="paragraph">
+<p>As long as the project has the <code>org.codehaus.griffon.griffon</code> plugin applied to it you
+may include the following snippet in <code>build.gradle</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="groovy language-groovy">dependencies {
+    griffon 'org.codehaus.griffon.plugins:griffon-shiro-plugin:1.0.0-SNAPSHOT'
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>griffon</code> plugin will take care of the rest given its configuration.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_manual"><a class="anchor" href="#_manual"></a>Manual</h5>
+<div class="paragraph">
+<p>You will need to configure any of the following blocks depending on your setup</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="groovy language-groovy">dependencies {
+    compile 'org.codehaus.griffon.plugins:griffon-shiro-core:1.0.0-SNAPSHOT'
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_maven"><a class="anchor" href="#_maven"></a>2.2.2. Maven</h4>
+<div class="paragraph">
+<p>First configure the <code>griffon-shiro-plugin</code> BOM in your POM file, by placing the following
+snippet before the <code>&lt;build&gt;</code> element</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="xml language-xml"><span class="tag">&lt;dependencyManagement&gt;</span>
+    <span class="tag">&lt;dependencies&gt;</span>
+        <span class="tag">&lt;dependency&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.codehaus.griffon.plugins<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>griffon-shiro-plugin<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;version&gt;</span>1.0.0-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+            <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
+            <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
+        <span class="tag">&lt;/dependency&gt;</span>
+    <span class="tag">&lt;/dependencies&gt;</span>
+<span class="tag">&lt;/dependencyManagement&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next configure dependencies as required by your particular setup</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="xml language-xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.codehaus.griffon.plugins<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>griffon-shiro-core<span class="tag">&lt;/artifactId&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_modules"><a class="anchor" href="#_modules"></a>3. Modules</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following sections display all bindings per module. Use this information to
+successfully override a binding on your own modules or to troubleshoot a module
+binding if the wrong type has been applied by the Griffon runtime.</p>
+</div>
+<div class="sect2">
+<h3 id="_shiro"><a class="anchor" href="#_shiro"></a>3.1. Shiro</h3>
+<div class="paragraph">
+<p>Module name: <code>fshiro</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay nowrap"><code class="java language-java">bind(<span class="predefined-type">SecurityManager</span>.class)
+    .toProvider(SecurityManagerProvider.class)
+    .asSingleton();
+
+bind(<span class="predefined-type">Subject</span>.class)
+    .toProvider(SubjectProvider.class)
+    .asSingleton();
+
+bind(SecurityFailureHandler.class)
+    .to(DefaultSecurityFailureHandler.class)
+    .asSingleton();
+
+bind(ActionInterceptor.class)
+    .to(ShiroActionInterceptor.class)
+    .asSingleton();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.0.0-SNAPSHOT<br>
+Last updated 2014-08-04 10:10:00 CEST
+</div>
+</div>
+</body>
+</html>
