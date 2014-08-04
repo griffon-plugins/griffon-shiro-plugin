@@ -1,0 +1,220 @@
+
+[[_configuration]]
+= Configuration
+
+The plugin requires an instance of +org.apache.shiro.mgt.SecurityManager+ to work.
+The +ShiroModule+ registers +{link_api_default_security_manager}+ as the default implementation
+that relies on a properties based +{link_api_realm}+, whose default settings point
+to a file named +shiro-users.properties+ that must be available in the classpath.
+The location of this resource may be changed too, defining a different value for
++shiro.realm.resource.path+ in the applications' configuration.
+
+Security failures are handled by default by simply logging the failed attempt.
+This behavior can be changed too, for example displaying a dialog with a meaningful
+message. To change the default behavior configure a module binding for +{link_api_security_failure_handler}+.
+
+Its value should be a className implementing +griffon.plugins.shiro.SecurityFailureHandler+.
+
+The following section was adapted from {link_grails_shiro} original by Peter Ledbrook ({link_pledbrook}).
+
+== Fine-tuning the Access Control
+
+The default Shiro setup provided this plugin  is very flexible and powerful. It's
+based on permission strings known as "wildcard permissions" that are simple to
+use, but in some ways difficult to understand because they are also very flexible.
+
+=== About Wildcard Permissions
+
+Let's start with an example. Say you want to protect access to your company's
+printers such that some people can print to particular printers, while others
+can find out what jobs are currently in the queue. The basic type of permission
+is therefore "printer", while we have two sub-types: "query" and "print". We
+also want to restrict access on a per-printer basis, so we then have a second
+sub-type that is the printer name. In wildcard permission format, the permission
+requirements are
+
+[source]
+----
+printer:query:lp720 0
+printer:print:epsoncolor
+----
+
+Notice how each part is separated by a colon? That's how the wildcard permission
+format separates what it calls "parts". It's also worth pointing out at this
+stage that Apache Shiro has no understanding of printer permissions - they are
+used and interpreted by the application.
+
+So those are permission requirements. They state what permission is required to
+do something. In the above example, the first permission says that a user must
+have the right to query the "lp7200" printer. That's just the application's
+interpretation of the string, though. You still need to code the permission
+requirement into your application. A simple way to do this is in a condition:
+
+[source,groovy]
+----
+if (subject.isPermitted('printer:query:lp7200')) {
+    // Return the current jobs on printer lp7200
+}
+----
+
+On the other side of the coin, you have permission assignments where you say what
+rights particular users have. In the quick start example, you saw a permission
+assignment in the BootStrap class.
+
+Assignments look a lot like permission requirements, but they also support syntax
+for wildcards and specifying multiple types or sub-types. What do I mean by that?
+Well, imagine you want a user to have print access to all the printers in a company.
+You could assign all the permissions manually:
+
+[source]
+----
+printer:print:lp7200
+printer:print:epsoncolor
+...
+----
+
+but this doesn't scale well, particularly when new printers are added. You can
+instead use a wildcard:
+
+[source]
+----
+printer:print:*
+----
+
+This does scale, because it covers any new printers as well. You could even allow
+access to all actions on all printers:
+
+[source]
+----
+printer:*:*
+----
+
+or all actions on a single printer:
+
+[source]
+----
+printer:*:lp7200
+----
+
+or even specific actions:
+
+[source]
+----
+printer:query,print:lp7200
+----
+
+The '*' wildcard and ',' sub-type separator can be used in any part of the
+permission, even the first part as you saw in the BootStrap example.
+
+One final thing to note about permission assignments: missing parts imply that
+the user has access to all values corresponding to that part. In other words,
+
+[source]
+----
+printer:print
+----
+
+is equivalent to
+
+[source]
+----
+printer:print:*
+----
+
+and
+
+[source]
+----
+printer
+----
+
+is equivalent to
+
+[source]
+----
+printer:*:*
+----
+
+However, you can only leave off parts from the end of the string, so this:
+
+[source]
+----
+printer:lp7200
+----
+
+is not equivalent to
+
+[source]
+----
+printer:*:lp7200
+----
+
+Permission assignments like these are typically done at the database level,
+although it depends on your realm implementation.
+
+== Build Configuration
+:groupId: org.codehaus.griffon.plugins
+
+=== Gradle
+
+You have two options for configuring this plugin: automatic and manual.
+
+==== Automatic
+
+As long as the project has the `org.codehaus.griffon.griffon` plugin applied to it you
+may include the following snippet in +build.gradle+
+
+[source,groovy,options="nowrap"]
+[subs="attributes"]
+----
+dependencies {
+    griffon '{groupId}:griffon-shiro-plugin:{project-version}'
+}
+----
+
+The `griffon` plugin will take care of the rest given its configuration.
+
+==== Manual
+
+You will need to configure any of the following blocks depending on your setup
+
+[source,groovy,options="nowrap"]
+[subs="attributes"]
+----
+dependencies {
+    compile '{groupId}:griffon-shiro-core:{project-version}'
+}
+----
+
+=== Maven
+
+First configure the `griffon-shiro-plugin` BOM in your POM file, by placing the following
+snippet before the `<build>` element
+
+[source,xml,options="nowrap"]
+[subs="attributes,verbatim"]
+----
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>{groupId}</groupId>
+            <artifactId>griffon-shiro-plugin</artifactId>
+            <version>{project-version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+Next configure dependencies as required by your particular setup
+
+[source,xml,options="nowrap"]
+[subs="attributes,verbatim"]
+----
+<dependency>
+    <groupId>{groupId}</groupId>
+    <artifactId>griffon-shiro-core</artifactId>
+</dependency>
+----
+

@@ -1,0 +1,21 @@
+= griffon-shiro-plugin
+:version: 1.0.0.SNAPSHOT
+:linkattrs:
+
+image:https://travis-ci.org/griffon-plugins/griffon-shiro-plugin.png?branch=master["Build Status", link="https://travis-ci.org/griffon-plugins/griffon-shiro-plugin"]
+image:https://coveralls.io/repos/griffon-plugins/griffon-shiro-plugin/badge.png["Coverage Status", link="https://coveralls.io/r/griffon-plugins/griffon-shiro-plugin"]
+image:http://img.shields.io/:semver-{version}-red.svg["Semantic Versioning", link="http://semver.org"]
+
+---
+
+http://shiro.apache.org/[Apache Shiro, window="_blank"] is a powerful and easy-to-use Java
+security framework that performs authentication, authorization, cryptography, and session management.
+
+This plugin enables access control on controller actions via a set of annotations.
+Security checks will be performed before an action is invoked. Annotated actions
+will be executed if the user meets the security criteria, otherwise execution is
+aborted. The plugin assumes sensible defaults where needed but also lets you
+customize behavior.
+
+Refer to the link:http://griffon-plugins.github.io/griffon-shiro-plugin/[plugin guide, window="_blank"] for
+further information on configuration and usage.

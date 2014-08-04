@@ -1,0 +1,9 @@
+
+:link_apache_shiro: link:http://shiro.apache.org/[Apache Shiro, window="_blank"]
+:link_java_authentication_guide: link:http://shiro.apache.org/java-authentication-guide.html[Java Authentication Guide, window="_blank"]
+:link_api_realm: link:http://shiro.apache.org/static/current/apidocs/org/apache/shiro/realm/Realm.html[org.apache.shiro.realm.Realm, window="_blank"]
+:link_grails_shiro: link:http://grails.org/plugin/shiro[Grails Shiro plugin, window="_blank"]
+:link_pledbrook: link:http://twitter.com/pledbrook[@pledbrook, window="_blank"]
+:link_api_default_security_manager: link:http://shiro.apache.org/static/1.2.3/apidocs/org/apache/shiro/mgt/DefaultSecurityManager.html[org.apache.shiro.mgt.DefaultSecurityManager, window="_blank"]
+:link_api_security_failure_handler: link:api/griffon/plugins/shiro/SecurityFailureHandler.html[griffon.plugins.shiro.SecurityFailureHandler, window="_blank"]
+
