@@ -12,7 +12,7 @@ binding if the wrong type has been applied by the Griffon runtime.
 
 == Shiro
 
-Module name: +fshiro+
+Module name: +shiro+
 
 [source,java,options="nowrap"]
 ----
