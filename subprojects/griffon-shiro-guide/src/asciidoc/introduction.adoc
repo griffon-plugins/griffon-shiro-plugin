@@ -15,22 +15,22 @@ customize behavior.
 
 Controller actions must be annotated with any of the following annotations
 
- * +@org.apache.shiro.authz.annotation.RequiresAuthentication+ - Requires the
+ * `@org.apache.shiro.authz.annotation.RequiresAuthentication` - Requires the
    current Subject to have been authenticated during their current session for
    the annotated class/instance/method to be accessed or invoked.
- * +@org.apache.shiro.authz.annotation.RequiresUser+ - Requires the current
+ * `@org.apache.shiro.authz.annotation.RequiresUser` - Requires the current
    Subject to be an authenticated user during their current session for
    the annotated class/instance/method to be accessed or invoked.
- * +@org.apache.shiro.authz.annotation.RequiresGuest+ - Requires the current
+ * `@org.apache.shiro.authz.annotation.RequiresGuest` - Requires the current
    Subject to be a "guest", that is, they are not authenticated or remembered
    from a previous session for the annotated class/instance/method to be
    accessed or invoked.
- * +@org.apache.shiro.authz.annotation.RequiresPermissions+ - Requires the
+ * `@org.apache.shiro.authz.annotation.RequiresPermissions` - Requires the
    current executor's Subject to imply a particular permission in order to
    execute the annotated method. If the executor's associated Subject determines
    that the executor does not imply the specified permission, the method will not
    be executed.
- * +@org.apache.shiro.authz.annotation.RequiresRoles+ - Requires the currently
+ * `@org.apache.shiro.authz.annotation.RequiresRoles` - Requires the currently
    executing Subject to have all of the specified roles. If they do not have the
    role(s), the method will not be executed.
 
@@ -55,15 +55,15 @@ class PrinterController {
 }
 ----
 
-Anyone making use of +PrinterController+ must be aun authenticated user. Everyone
-with the permissions +printer:print+ may call the +print+ action. Only those users
-that have been authenticated _and_ posses the +administrator+ role are able to
-call the +configure+ action.
+Anyone making use of `PrinterController` must be aun authenticated user. Everyone
+with the permissions `printer:print` may call the `print` action. Only those users
+that have been authenticated _and_ posses the `administrator` role are able to
+call the `configure` action.
 
 Apache Shiro's {link_java_authentication_guide} presents the basic vocabulary and
 behavior required to authenticate a user into the system. In particular, the
-+SecurityUtils+ class is used to store the current +Subject+. You may also inject
-an +Subject+ instance, like so
+`SecurityUtils` class is used to store the current `Subject`. You may also inject
+an `Subject` instance, like so
 
 [source,groovy,linenumbers,options="nowrap"]
 ----
@@ -95,5 +95,5 @@ class LoginController {
 }
 ----
 
-The +login+ action will be executed when there's no authenticated user while
-the +logout+ action will be executed only if the user is currently authenticated.
+The `login` action will be executed when there's no authenticated user while
+the `logout` action will be executed only if the user is currently authenticated.

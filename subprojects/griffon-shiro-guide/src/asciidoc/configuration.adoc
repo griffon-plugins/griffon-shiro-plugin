@@ -2,18 +2,18 @@
 [[_configuration]]
 = Configuration
 
-The plugin requires an instance of +org.apache.shiro.mgt.SecurityManager+ to work.
-The +ShiroModule+ registers +{link_api_default_security_manager}+ as the default implementation
-that relies on a properties based +{link_api_realm}+, whose default settings point
-to a file named +shiro-users.properties+ that must be available in the classpath.
+The plugin requires an instance of `org.apache.shiro.mgt.SecurityManager` to work.
+The `ShiroModule` registers `{link_api_default_security_manager}` as the default implementation
+that relies on a properties based `{link_api_realm}`, whose default settings point
+to a file named `shiro-users.properties` that must be available in the classpath.
 The location of this resource may be changed too, defining a different value for
-+shiro.realm.resource.path+ in the applications' configuration.
+`shiro.realm.resource.path` in the applications' configuration.
 
 Security failures are handled by default by simply logging the failed attempt.
 This behavior can be changed too, for example displaying a dialog with a meaningful
-message. To change the default behavior configure a module binding for +{link_api_security_failure_handler}+.
+message. To change the default behavior configure a module binding for `{link_api_security_failure_handler}`.
 
-Its value should be a className implementing +griffon.plugins.shiro.SecurityFailureHandler+.
+Its value should be a className implementing `griffon.plugins.shiro.SecurityFailureHandler`.
 
 The following section was adapted from {link_grails_shiro} original by Peter Ledbrook ({link_pledbrook}).
 
@@ -153,7 +153,6 @@ Permission assignments like these are typically done at the database level,
 although it depends on your realm implementation.
 
 == Build Configuration
-:groupId: org.codehaus.griffon.plugins
 
 === Gradle
 
@@ -162,13 +161,13 @@ You have two options for configuring this plugin: automatic and manual.
 ==== Automatic
 
 As long as the project has the `org.codehaus.griffon.griffon` plugin applied to it you
-may include the following snippet in +build.gradle+
+may include the following snippet in `build.gradle`
 
 [source,groovy,options="nowrap"]
 [subs="attributes"]
 ----
 dependencies {
-    griffon '{groupId}:griffon-shiro-plugin:{project-version}'
+    griffon '{project-group}:griffon-shiro-plugin:{project-version}'
 }
 ----
 
@@ -182,7 +181,7 @@ You will need to configure any of the following blocks depending on your setup
 [subs="attributes"]
 ----
 dependencies {
-    compile '{groupId}:griffon-shiro-core:{project-version}'
+    compile '{project-group}:griffon-shiro-core:{project-version}'
 }
 ----
 
@@ -197,7 +196,7 @@ snippet before the `<build>` element
 <dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>{groupId}</groupId>
+            <groupId>{project-group}</groupId>
             <artifactId>griffon-shiro-plugin</artifactId>
             <version>{project-version}</version>
             <type>pom</type>
@@ -213,7 +212,7 @@ Next configure dependencies as required by your particular setup
 [subs="attributes,verbatim"]
 ----
 <dependency>
-    <groupId>{groupId}</groupId>
+    <groupId>{project-group}</groupId>
     <artifactId>griffon-shiro-core</artifactId>
 </dependency>
 ----
