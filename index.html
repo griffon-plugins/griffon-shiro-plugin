@@ -4,41 +4,38 @@
 <meta charset="utf-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.0.preview.7">
-<meta name="author" content="aalmiray">
+<meta name="generator" content="Asciidoctor 1.5.0">
+<meta name="author" content="Andres Almiray">
 <title>Griffon Shiro Plugin</title>
 <link rel="stylesheet" href="./css/style.css">
-<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="./coderay-asciidoctor.css">
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
 <h1>Griffon Shiro Plugin</h1>
-<span id="author" class="author">aalmiray</span><br>
-<span id="revnumber">version 1.0.0-SNAPSHOT</span>
+<div class="details">
+<span id="author" class="author">Andres Almiray</span><br>
+<span id="revnumber">version 1.0.0</span>
+</div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a></li>
-<li>
+<li><a href="#_introduction">1. Introduction</a>
 <ul class="sectlevel2">
 <li><a href="#_usage">1.1. Usage</a></li>
 </ul>
 </li>
-<li><a href="#_configuration">2. Configuration</a></li>
-<li>
+<li><a href="#_configuration">2. Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_fine_tuning_the_access_control">2.1. Fine-tuning the Access Control</a></li>
-<li>
+<li><a href="#_fine_tuning_the_access_control">2.1. Fine-tuning the Access Control</a>
 <ul class="sectlevel3">
 <li><a href="#_about_wildcard_permissions">2.1.1. About Wildcard Permissions</a></li>
 </ul>
 </li>
-<li><a href="#_build_configuration">2.2. Build Configuration</a></li>
-<li>
+<li><a href="#_build_configuration">2.2. Build Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_gradle">2.2.1. Gradle</a></li>
-<li>
+<li><a href="#_gradle">2.2.1. Gradle</a>
 <ul class="sectlevel4">
 <li><a href="#_automatic">Automatic</a></li>
 <li><a href="#_manual">Manual</a></li>
@@ -49,8 +46,7 @@
 </li>
 </ul>
 </li>
-<li><a href="#_modules">3. Modules</a></li>
-<li>
+<li><a href="#_modules">3. Modules</a>
 <ul class="sectlevel2">
 <li><a href="#_shiro">3.1. Shiro</a></li>
 </ul>
@@ -118,19 +114,35 @@ applied at the class level, for example</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="groovy language-groovy"><span class="line-numbers"> 1</span><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
-<span class="line-numbers"> 2</span><span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
-<span class="line-numbers"> 3</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
-<span class="line-numbers"> 4</span>
-<span class="line-numbers"> 5</span><span class="annotation">@RequiresAuthentication</span>
-<span class="line-numbers"> 6</span><span class="annotation">@ArtifactProviderFor</span>(GriffonController)
-<span class="line-numbers"> 7</span><span class="type">class</span> <span class="class">PrinterController</span> {
-<span class="line-numbers"> 8</span>    <span class="annotation">@RequiresPermission</span>(<span class="string"><span class="delimiter">'</span><span class="content">printer:print</span><span class="delimiter">'</span></span>)
-<span class="line-numbers"> 9</span>    <span class="type">void</span> print() { ... }
-<span class="line-numbers"><strong>10</strong></span>
-<span class="line-numbers">11</span>    <span class="annotation">@RequiresRoles</span>(<span class="string"><span class="delimiter">'</span><span class="content">administrator</span><span class="delimiter">'</span></span>)
-<span class="line-numbers">12</span>    <span class="type">void</span> configure() { ... }
-<span class="line-numbers">13</span>}</code></pre>
+<pre class="CodeRay highlight nowrap"><code data-lang="groovy"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+<strong>10</strong>
+11
+12
+13
+</pre></td>
+  <td class="code"><pre><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
+<span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
+<span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
+
+<span class="annotation">@RequiresAuthentication</span>
+<span class="annotation">@ArtifactProviderFor</span>(GriffonController)
+<span class="type">class</span> <span class="class">PrinterController</span> {
+    <span class="annotation">@RequiresPermission</span>(<span class="string"><span class="delimiter">'</span><span class="content">printer:print</span><span class="delimiter">'</span></span>)
+    <span class="type">void</span> print() { ... }
+
+    <span class="annotation">@RequiresRoles</span>(<span class="string"><span class="delimiter">'</span><span class="content">administrator</span><span class="delimiter">'</span></span>)
+    <span class="type">void</span> configure() { ... }
+}</pre></td>
+</tr></table></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -147,32 +159,61 @@ an <code>Subject</code> instance, like so</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="groovy language-groovy"><span class="line-numbers"> 1</span><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
-<span class="line-numbers"> 2</span><span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
-<span class="line-numbers"> 3</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
-<span class="line-numbers"> 4</span><span class="keyword">import</span> <span class="include">org.apache.shiro.authc.UsernamePasswordToken</span>
-<span class="line-numbers"> 5</span><span class="keyword">import</span> <span class="include">org.apache.shiro.subject.Subject</span>
-<span class="line-numbers"> 6</span>
-<span class="line-numbers"> 7</span><span class="annotation">@RequiresAuthentication</span>
-<span class="line-numbers"> 8</span><span class="annotation">@ArtifactProviderFor</span>(GriffonController)
-<span class="line-numbers"> 9</span><span class="type">class</span> <span class="class">LoginController</span> {
-<span class="line-numbers"><strong>10</strong></span>    LoginModel model
-<span class="line-numbers">11</span>
-<span class="line-numbers">12</span>    <span class="annotation">@Inject</span>
-<span class="line-numbers">13</span>    <span class="directive">private</span> <span class="predefined-type">Subject</span> subject
-<span class="line-numbers">14</span>
-<span class="line-numbers">15</span>    <span class="annotation">@RequiresGuest</span>
-<span class="line-numbers">16</span>    <span class="type">void</span> login() {
-<span class="line-numbers">17</span>        UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(
-<span class="line-numbers">18</span>            model.username, model.password)
-<span class="line-numbers">19</span>        subject.login(token)
-<span class="line-numbers"><strong>20</strong></span>    }
-<span class="line-numbers">21</span>
-<span class="line-numbers">22</span>    <span class="annotation">@RequiresAuthentication</span>
-<span class="line-numbers">23</span>    <span class="type">void</span> logout() {
-<span class="line-numbers">24</span>        subject.logout()
-<span class="line-numbers">25</span>    }
-<span class="line-numbers">26</span>}</code></pre>
+<pre class="CodeRay highlight nowrap"><code data-lang="groovy"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+<strong>10</strong>
+11
+12
+13
+14
+15
+16
+17
+18
+19
+<strong>20</strong>
+21
+22
+23
+24
+25
+26
+</pre></td>
+  <td class="code"><pre><span class="keyword">import</span> <span class="include">griffon.core.artifact.GriffonController</span>
+<span class="keyword">import</span> <span class="include">griffon.metadata.ArtifactProviderFor</span>
+<span class="keyword">import</span> <span class="include">org.apache.shiro.authz.annotation.*</span>
+<span class="keyword">import</span> <span class="include">org.apache.shiro.authc.UsernamePasswordToken</span>
+<span class="keyword">import</span> <span class="include">org.apache.shiro.subject.Subject</span>
+
+<span class="annotation">@RequiresAuthentication</span>
+<span class="annotation">@ArtifactProviderFor</span>(GriffonController)
+<span class="type">class</span> <span class="class">LoginController</span> {
+    LoginModel model
+
+    <span class="annotation">@Inject</span>
+    <span class="directive">private</span> <span class="predefined-type">Subject</span> subject
+
+    <span class="annotation">@RequiresGuest</span>
+    <span class="type">void</span> login() {
+        UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(
+            model.username, model.password)
+        subject.login(token)
+    }
+
+    <span class="annotation">@RequiresAuthentication</span>
+    <span class="type">void</span> logout() {
+        subject.logout()
+    }
+}</pre></td>
+</tr></table></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -191,7 +232,7 @@ The <code>ShiroModule</code> registers <code><a href="http://shiro.apache.org/st
 that relies on a properties based <code><a href="http://shiro.apache.org/static/current/apidocs/org/apache/shiro/realm/Realm.html" target="_blank">org.apache.shiro.realm.Realm</a></code>, whose default settings point
 to a file named <code>shiro-users.properties</code> that must be available in the classpath.
 The location of this resource may be changed too, defining a different value for
-<code>shiro.realm.resource.path</code> in the applications&#8217; configuration.</p>
+<code>shiro.realm.resource.path</code> in the applications' configuration.</p>
 </div>
 <div class="paragraph">
 <p>Security failures are handled by default by simply logging the failed attempt.
@@ -224,7 +265,7 @@ requirements are</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:query:lp720 0
+<pre class="CodeRay highlight"><code>printer:query:lp720 0
 printer:print:epsoncolor</code></pre>
 </div>
 </div>
@@ -243,7 +284,7 @@ requirement into your application. A simple way to do this is in a condition:</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code class="groovy language-groovy"><span class="keyword">if</span> (subject.isPermitted(<span class="string"><span class="delimiter">'</span><span class="content">printer:query:lp7200</span><span class="delimiter">'</span></span>)) {
+<pre class="CodeRay highlight"><code data-lang="groovy"><span class="keyword">if</span> (subject.isPermitted(<span class="string"><span class="delimiter">'</span><span class="content">printer:query:lp7200</span><span class="delimiter">'</span></span>)) {
     <span class="comment">// Return the current jobs on printer lp7200</span>
 }</code></pre>
 </div>
@@ -261,7 +302,7 @@ You could assign all the permissions manually:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:print:lp7200
+<pre class="CodeRay highlight"><code>printer:print:lp7200
 printer:print:epsoncolor
 ...</code></pre>
 </div>
@@ -272,7 +313,7 @@ instead use a wildcard:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:print:*</code></pre>
+<pre class="CodeRay highlight"><code>printer:print:*</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -281,7 +322,7 @@ access to all actions on all printers:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:*:*</code></pre>
+<pre class="CodeRay highlight"><code>printer:*:*</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -289,7 +330,7 @@ access to all actions on all printers:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:*:lp7200</code></pre>
+<pre class="CodeRay highlight"><code>printer:*:lp7200</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -297,11 +338,11 @@ access to all actions on all printers:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:query,print:lp7200</code></pre>
+<pre class="CodeRay highlight"><code>printer:query,print:lp7200</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <em>*</em> wildcard and <em>,</em> sub-type separator can be used in any part of the
+<p>The '*' wildcard and ',' sub-type separator can be used in any part of the
 permission, even the first part as you saw in the BootStrap example.</p>
 </div>
 <div class="paragraph">
@@ -310,7 +351,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:print</code></pre>
+<pre class="CodeRay highlight"><code>printer:print</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -318,7 +359,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:print:*</code></pre>
+<pre class="CodeRay highlight"><code>printer:print:*</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -326,7 +367,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer</code></pre>
+<pre class="CodeRay highlight"><code>printer</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -334,7 +375,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:*:*</code></pre>
+<pre class="CodeRay highlight"><code>printer:*:*</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -342,7 +383,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:lp7200</code></pre>
+<pre class="CodeRay highlight"><code>printer:lp7200</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -350,7 +391,7 @@ the user has access to all values corresponding to that part. In other words,</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay"><code>printer:*:lp7200</code></pre>
+<pre class="CodeRay highlight"><code>printer:*:lp7200</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -374,8 +415,8 @@ may include the following snippet in <code>build.gradle</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="groovy language-groovy">dependencies {
-    griffon 'org.codehaus.griffon.plugins:griffon-shiro-plugin:1.0.0-SNAPSHOT'
+<pre class="CodeRay highlight nowrap"><code data-lang="groovy">dependencies {
+    griffon 'org.codehaus.griffon.plugins:griffon-shiro-plugin:1.0.0'
 }</code></pre>
 </div>
 </div>
@@ -390,8 +431,8 @@ may include the following snippet in <code>build.gradle</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="groovy language-groovy">dependencies {
-    compile 'org.codehaus.griffon.plugins:griffon-shiro-core:1.0.0-SNAPSHOT'
+<pre class="CodeRay highlight nowrap"><code data-lang="groovy">dependencies {
+    compile 'org.codehaus.griffon.plugins:griffon-shiro-core:1.0.0'
 }</code></pre>
 </div>
 </div>
@@ -405,12 +446,12 @@ snippet before the <code>&lt;build&gt;</code> element</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="xml language-xml"><span class="tag">&lt;dependencyManagement&gt;</span>
+<pre class="CodeRay highlight nowrap"><code data-lang="xml"><span class="tag">&lt;dependencyManagement&gt;</span>
     <span class="tag">&lt;dependencies&gt;</span>
         <span class="tag">&lt;dependency&gt;</span>
             <span class="tag">&lt;groupId&gt;</span>org.codehaus.griffon.plugins<span class="tag">&lt;/groupId&gt;</span>
             <span class="tag">&lt;artifactId&gt;</span>griffon-shiro-plugin<span class="tag">&lt;/artifactId&gt;</span>
-            <span class="tag">&lt;version&gt;</span>1.0.0-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+            <span class="tag">&lt;version&gt;</span>1.0.0<span class="tag">&lt;/version&gt;</span>
             <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
             <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
         <span class="tag">&lt;/dependency&gt;</span>
@@ -423,7 +464,7 @@ snippet before the <code>&lt;build&gt;</code> element</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="xml language-xml"><span class="tag">&lt;dependency&gt;</span>
+<pre class="CodeRay highlight nowrap"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.codehaus.griffon.plugins<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>griffon-shiro-core<span class="tag">&lt;/artifactId&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
@@ -444,11 +485,11 @@ binding if the wrong type has been applied by the Griffon runtime.</p>
 <div class="sect2">
 <h3 id="_shiro"><a class="anchor" href="#_shiro"></a>3.1. Shiro</h3>
 <div class="paragraph">
-<p>Module name: <code>fshiro</code></p>
+<p>Module name: <code>shiro</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay nowrap"><code class="java language-java">bind(<span class="predefined-type">SecurityManager</span>.class)
+<pre class="CodeRay highlight nowrap"><code data-lang="java">bind(<span class="predefined-type">SecurityManager</span>.class)
     .toProvider(SecurityManagerProvider.class)
     .asSingleton();
 
@@ -482,8 +523,8 @@ bind(ActionInterceptor.class)
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.0.0-SNAPSHOT<br>
-Last updated 2014-08-04 10:16:59 CEST
+Version 1.0.0<br>
+Last updated 2014-10-10 15:04:17 CDT
 </div>
 </div>
 </body>
