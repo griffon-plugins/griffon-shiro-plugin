@@ -15,7 +15,7 @@
  */
 package org.codehaus.griffon.runtime.shiro;
 
-import griffon.core.controller.ActionInterceptor;
+import griffon.core.controller.ActionHandler;
 import griffon.core.injection.Module;
 import griffon.plugins.shiro.SecurityFailureHandler;
 import org.apache.shiro.mgt.SecurityManager;
@@ -46,8 +46,8 @@ public class ShiroModule extends AbstractModule {
             .to(DefaultSecurityFailureHandler.class)
             .asSingleton();
 
-        bind(ActionInterceptor.class)
-            .to(ShiroActionInterceptor.class)
+        bind(ActionHandler.class)
+            .to(ShiroActionHandler.class)
             .asSingleton();
         // end::bindings[]
     }
