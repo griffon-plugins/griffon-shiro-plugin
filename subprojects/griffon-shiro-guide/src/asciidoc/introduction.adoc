@@ -97,3 +97,6 @@ class LoginController {
 
 The `login` action will be executed when there's no authenticated user while
 the `logout` action will be executed only if the user is currently authenticated.
+
+Griffon version: {griffon-version}
+

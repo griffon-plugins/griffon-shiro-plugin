@@ -59,6 +59,31 @@ public class ShiroActionHandler extends AbstractActionHandler {
         configureAction(action, method);
     }
 
+    /**
+     * Evaluates if thr given {@code Action} is authorized given the security constraints applied to it
+     * and the current {@code Subject}.
+     *
+     * @param action the {@code Action} to verify.
+     * @return <tt>true</tt> if the {@code Action} meets the security requirements, <tt>false</tt> otherwise.
+     * @since 1.3.0
+     */
+    public boolean isAuthorized(@Nonnull Action action) {
+        String fqActionName = action.getFullyQualifiedName();
+        ActionRequirement actionRequirement = requirementsPerAction.get(fqActionName);
+
+        if (actionRequirement != null) {
+            for (RequirementConfiguration requirementConfiguration : actionRequirement.getRequirements()) {
+                LOG.debug("Evaluating security requirement {}", requirementConfiguration);
+
+                if (!requirementConfiguration.eval(subject)) {
+                    LOG.debug("Subject did not meet expected security requirements.");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Nonnull
     @Override
     public Object[] before(@Nonnull Action action, @Nonnull Object[] args) {
