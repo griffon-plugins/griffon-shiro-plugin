@@ -61,7 +61,7 @@ public class ShiroActionHandler extends AbstractActionHandler {
     }
 
     /**
-     * Evaluates if thr given {@code Action} is authorized given the security constraints applied to it
+     * Evaluates if the given {@code Action} is authorized given the security constraints applied to it
      * and the current {@code Subject}.
      *
      * @param action the {@code Action} to verify.
