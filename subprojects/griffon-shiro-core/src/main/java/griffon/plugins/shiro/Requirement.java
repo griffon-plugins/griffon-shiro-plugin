@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codehaus.griffon.runtime.shiro;
+package griffon.plugins.shiro;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * @author Andres Almiray
+ * @since 1.4.0
  */
-public class SubjectProvider implements Provider<Subject> {
-    @Inject
-    private SecurityManager securityManager;
+public enum Requirement {
+    USER(new UserRequirementEvaluator()),
+    AUTHENTICATION(new AuthenticationRequirementEvaluator()),
+    ROLES(new RolesRequirementEvaluator()),
+    PERMISSIONS(new PermissionsRequirementEvaluator()),
+    GUEST(new GuestRequirementEvaluator());
 
-    @Override
-    public Subject get() {
-        SecurityUtils.setSecurityManager(securityManager);
-        return SecurityUtils.getSubject();
+    private final RequirementEvaluator requirementEvaluator;
+
+    private Requirement(RequirementEvaluator requirementEvaluator) {
+        this.requirementEvaluator = requirementEvaluator;
+    }
+
+    protected boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
+        return requirementEvaluator.eval(requirementConfig, subject);
     }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright $today.year the original author or authors.
+ * Copyright 2014-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,9 @@ package org.codehaus.griffon.runtime.shiro;
 
 import griffon.core.artifact.GriffonController;
 import griffon.core.controller.Action;
+import griffon.plugins.shiro.Requirement;
+import griffon.plugins.shiro.RequirementConfiguration;
 import griffon.plugins.shiro.SecurityFailureHandler;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
@@ -98,7 +99,7 @@ public class ShiroActionHandler extends AbstractActionHandler {
 
                 if (!requirementConfiguration.eval(subject)) {
                     LOG.debug("Subject did not meet expected security requirements.");
-                    switch (requirementConfiguration.requirement) {
+                    switch (requirementConfiguration.getRequirement()) {
                         case USER:
                             securityFailureHandler.handleFailure(subject,
                                 SecurityFailureHandler.Kind.USER,
@@ -140,7 +141,7 @@ public class ShiroActionHandler extends AbstractActionHandler {
         String fqActionName = action.getFullyQualifiedName();
         if (requirementsPerAction.get(fqActionName) != null) return;
 
-        Map<Requirement, RequirementConfiguration> requirements = new LinkedHashMap<Requirement, RequirementConfiguration>();
+        Map<Requirement, RequirementConfiguration> requirements = new LinkedHashMap<>();
 
         GriffonController controller = action.getController();
         // grab global requirements from controller
@@ -197,108 +198,6 @@ public class ShiroActionHandler extends AbstractActionHandler {
         requirements.put(Requirement.GUEST, new RequirementConfiguration(Requirement.GUEST));
     }
 
-    private enum Requirement {
-        USER(new UserRequirementEvaluator()),
-        AUTHENTICATION(new AuthenticationRequirementEvaluator()),
-        ROLES(new RolesRequirementEvaluator()),
-        PERMISSIONS(new PermissionsRequirementEvaluator()),
-        GUEST(new GuestRequirementEvaluator());
-
-        private final RequirementEvaluator requirementEvaluator;
-
-        private Requirement(RequirementEvaluator requirementEvaluator) {
-            this.requirementEvaluator = requirementEvaluator;
-        }
-
-        private boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            return requirementEvaluator.eval(requirementConfig, subject);
-        }
-    }
-
-    private static interface RequirementEvaluator {
-        boolean eval(RequirementConfiguration requirementConfig, Subject subject);
-    }
-
-    private static class UserRequirementEvaluator implements RequirementEvaluator {
-        public boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            return subject.isRemembered();
-        }
-    }
-
-    private static class AuthenticationRequirementEvaluator implements RequirementEvaluator {
-        public boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            return subject.isAuthenticated();
-        }
-    }
-
-    private static class GuestRequirementEvaluator implements RequirementEvaluator {
-        public boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            return subject.getPrincipal() == null;
-        }
-    }
-
-    private static class RolesRequirementEvaluator implements RequirementEvaluator {
-        public boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            String[] roles = requirementConfig.getValues();
-            Logical logical = requirementConfig.getLogical();
-
-            try {
-                if (roles.length == 1) {
-                    subject.checkRole(roles[0]);
-                } else if (Logical.AND.equals(logical)) {
-                    subject.checkRoles(Arrays.asList(roles));
-                } else if (Logical.OR.equals(logical)) {
-                    boolean hasAtLeastOneRole = false;
-                    for (String role : roles) {
-                        if (subject.hasRole(role)) {
-                            hasAtLeastOneRole = true;
-                        }
-                    }
-                    if (!hasAtLeastOneRole) {
-                        subject.checkRole(roles[0]);
-                    } else {
-                        return true;
-                    }
-                }
-            } catch (AuthorizationException ae) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    private static class PermissionsRequirementEvaluator implements RequirementEvaluator {
-        public boolean eval(RequirementConfiguration requirementConfig, Subject subject) {
-            String[] perms = requirementConfig.getValues();
-            Logical logical = requirementConfig.getLogical();
-
-            try {
-                if (perms.length == 1) {
-                    subject.checkPermission(perms[0]);
-                } else if (Logical.AND.equals(logical)) {
-                    subject.checkPermissions(perms);
-                } else if (Logical.OR.equals(logical)) {
-                    boolean hasAtLeastOnePermission = false;
-                    for (String permission : perms) {
-                        if (subject.isPermitted(permission)) {
-                            hasAtLeastOnePermission = true;
-                        }
-                    }
-                    if (!hasAtLeastOnePermission) {
-                        subject.checkPermission(perms[0]);
-                    } else {
-                        return true;
-                    }
-                }
-            } catch (AuthorizationException ae) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
     private static class ActionRequirement {
         private final String actionName;
         private final RequirementConfiguration[] requirements;
@@ -338,66 +237,6 @@ public class ShiroActionHandler extends AbstractActionHandler {
             return "ActionRequirement{" +
                 "actionName='" + actionName + '\'' +
                 ", requirements=" + (requirements == null ? null : Arrays.asList(requirements)) +
-                '}';
-        }
-    }
-
-    private static class RequirementConfiguration {
-        private static final String[] EMPTY = new String[0];
-        private final Requirement requirement;
-        private final String[] values;
-        private final Logical logical;
-
-        private RequirementConfiguration(Requirement requirement) {
-            this(requirement, EMPTY, Logical.AND);
-        }
-
-        private RequirementConfiguration(Requirement requirement, String[] values, Logical logical) {
-            this.requirement = requirement;
-            this.values = values;
-            this.logical = logical;
-        }
-
-        public Requirement getRequirement() {
-            return requirement;
-        }
-
-        public String[] getValues() {
-            return values;
-        }
-
-        public Logical getLogical() {
-            return logical;
-        }
-
-        public boolean eval(Subject subject) {
-            return requirement.eval(this, subject);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RequirementConfiguration that = (RequirementConfiguration) o;
-
-            return logical == that.logical && requirement == that.requirement && Arrays.equals(values, that.values);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = requirement.hashCode();
-            result = 31 * result + Arrays.hashCode(values);
-            result = 31 * result + logical.hashCode();
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "RequirementConfiguration{" +
-                "requirement=" + requirement +
-                ", values=" + (values == null ? null : Arrays.asList(values)) +
-                ", logical=" + logical +
                 '}';
         }
     }

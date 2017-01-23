@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codehaus.griffon.runtime.shiro;
+package griffon.plugins.shiro;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.annotation.Nonnull;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Andres Almiray
+ * @since 1.4.0
  */
-public class SubjectProvider implements Provider<Subject> {
-    @Inject
-    private SecurityManager securityManager;
-
+public abstract class AbstractRequirementEvaluator implements RequirementEvaluator {
     @Override
-    public Subject get() {
-        SecurityUtils.setSecurityManager(securityManager);
-        return SecurityUtils.getSubject();
+    public boolean eval(@Nonnull RequirementConfiguration requirementConfig, @Nonnull Subject subject) {
+        requireNonNull(requirementConfig, "Argument 'requirementConfig' must not be null");
+        requireNonNull(subject, "Argument 'subject' must not be null");
+        return doEval(requirementConfig, subject);
     }
+
+    protected abstract boolean doEval(@Nonnull RequirementConfiguration requirementConfig, @Nonnull Subject subject);
 }
