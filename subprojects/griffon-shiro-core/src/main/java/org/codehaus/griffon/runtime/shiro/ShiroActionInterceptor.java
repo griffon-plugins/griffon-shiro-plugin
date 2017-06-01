@@ -49,7 +49,7 @@ public class ShiroActionInterceptor extends ShiroActionHandler implements Action
 
     @Override
     public void after(@Nonnull ActionExecutionStatus status, @Nonnull GriffonController controller, @Nonnull String actionName, @Nonnull Object[] args) {
-        after(status, actionFor(controller, actionName), args);
+        after(status, actionFor(controller, actionName), args, null);
     }
 
     @Override
