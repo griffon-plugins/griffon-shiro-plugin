@@ -15,18 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package griffon.plugins.shiro;
+ext.projectDependencies = [
+    ':griffon-shiro-core'
+]
 
-import griffon.annotations.core.Nonnull;
-import org.apache.shiro.subject.Subject;
-
-/**
- * @author Andres Almiray
- * @since 1.4.0
- */
-public class AuthenticationRequirementEvaluator extends AbstractRequirementEvaluator {
-    @Override
-    protected boolean doEval(@Nonnull RequirementConfiguration requirementConfig, @Nonnull Subject subject) {
-        return subject.isAuthenticated();
-    }
-}
+ext.projectDependencies.each { evaluationDependsOn it }
