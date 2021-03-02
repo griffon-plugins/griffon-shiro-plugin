@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2014-2020 The author and/or original authors.
+ * Copyright 2014-2021 The author and/or original authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresGuest
 import org.apache.shiro.authz.annotation.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresRoles
 import org.apache.shiro.authz.annotation.RequiresUser
-import org.kordamp.jipsy.ServiceProviderFor
+import org.kordamp.jipsy.annotations.ServiceProviderFor
 
 @ServiceProviderFor(GriffonController)
 class ShiroController {

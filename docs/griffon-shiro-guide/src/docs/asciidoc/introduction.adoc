@@ -41,7 +41,7 @@ applied at the class level, for example
 [source,groovy,linenumbers,options="nowrap"]
 ----
 import griffon.core.artifact.GriffonController
-import org.kordamp.jipsy.ServiceProviderFor
+import org.kordamp.jipsy.annotations.ServiceProviderFor
 import org.apache.shiro.authz.annotation.*
 
 @RequiresAuthentication
@@ -68,7 +68,7 @@ an `Subject` instance, like so
 [source,groovy,linenumbers,options="nowrap"]
 ----
 import griffon.core.artifact.GriffonController
-import org.kordamp.jipsy.ServiceProviderFor
+import org.kordamp.jipsy.annotations.ServiceProviderFor
 import org.apache.shiro.authz.annotation.*
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
